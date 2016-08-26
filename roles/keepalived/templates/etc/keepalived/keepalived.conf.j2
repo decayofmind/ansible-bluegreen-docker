@@ -1,0 +1,30 @@
+vrrp_script chk_nginx {
+        script "pidof nginx"
+        interval 2
+}
+
+vrrp_instance VI_1 {
+    state {% if keepalived_master is defined %}MASTER{% else %}SLAVE{% endif %}
+    interface {{ ansible_default_ipv4['interface'] }}
+    virtual_router_id {{ keepalived_vrid }}
+    priority {% if keepalived_master is defined %}200{% else %}100{% endif %}
+    authentication {
+        auth_type PASS
+        auth_pass {{ keepalived_password }}
+    }
+    virtual_ipaddress {
+        {{ virtual_ip }}
+    }
+
+    unicast_src_ip {% for host in groups[env_name] %}{% if hostvars[host]['keepalived_master'] is defined %}{{ hostvars[host]['ansible_default_ipv4']['address'] }}{% endif %}{% endfor %}
+
+
+    unicast_peer {
+                {% for host in groups[env_name] %}{% if hostvars[host]['keepalived_master'] is not defined %}{{ hostvars[host]['ansible_default_ipv4']['address']  }}{% endif %}{% endfor %}
+    }
+
+
+    track_script {
+        chk_nginx
+    }
+}

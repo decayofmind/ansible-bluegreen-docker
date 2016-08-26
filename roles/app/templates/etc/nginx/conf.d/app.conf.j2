@@ -1,0 +1,44 @@
+# {{ ansible_managed }}
+
+upstream app {
+    #ip_hash;
+{% for result in deploy.results %}
+{% for k,v in result.ansible_facts.ansible_docker_container.NetworkSettings.Ports.iteritems() %}
+    server 127.0.0.1:{{ v[0].HostPort }};
+{% endfor %}
+{% endfor %}
+{% if groups[env_name]|length > 1 %}
+{% for host in groups[env_name] %}
+{% if host != inventory_hostname %}
+    server {{ hostvars[host]['ansible_default_ipv4']['address'] }}:80;
+{% endif %}
+{% endfor %}
+{% endif %}
+}
+
+server {
+    listen       {{ ansible_default_ipv4['address'] }}:80       default_server ;
+    listen       {{ virtual_ip }}:80 ;
+    server_name  {{ app_hostname }} _ "" ;
+
+    proxy_buffering off;
+    proxy_store off;
+    proxy_cache off;
+    client_max_body_size 1g;
+
+    location ~* / {
+        proxy_set_header  				Host $host;
+        proxy_set_header  				X-Forwarded-Server $host;
+        proxy_set_header  				X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass_header 				X-Accel-Redirect;
+        proxy_set_header  				X-Real-IP $remote_addr;
+        proxy_buffer_size   			128k;
+        proxy_buffers   					4 256k;
+        proxy_busy_buffers_size   256k;
+
+        proxy_pass      http://app ;
+
+    }
+
+}
+

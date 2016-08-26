@@ -1,0 +1,6 @@
+---
+dependencies:
+    - { role: docker }
+    - { role: nginx }
+
+# vim: set et fenc= ft=ansible sts=2 sw=2 ts=8 tw=0 :

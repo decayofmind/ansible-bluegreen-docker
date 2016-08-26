@@ -1,0 +1,40 @@
+---
+- name: do blue/green logic
+  include: pre_tasks.yml
+  when: bluegreen | bool
+
+- debug: msg="DEPLOYING {{ app_name }}.{% if bluegreen | bool %} Color of this deploy is {{ next_color| upper }}.{% endif %} Version is {{ app_version }}"
+  run_once: yes
+  tags:
+    - app:info
+    - app:deploy
+
+- name: deploy app
+  docker_container:
+    name: "{{ app_name }}{% if bluegreen | bool %}_{{ next_color }}{% endif %}_{{ item }}"
+    state: started
+    ports: all
+    recreate: yes
+    image: "{{ app_repo| d(app_name) }}:{{ app_version }}"
+    restart_policy: unless-stopped
+    env:
+      REDIS_HOST: "{{ redis_host }}"
+  with_sequence: count={{ app_instances_count }}
+  check_mode: "{{ check_mode }}"
+  register: deploy
+  tags:
+    - app:deploy
+
+- name: generate nginx config for app
+  template: src=etc/nginx/conf.d/app.conf.j2 dest="/etc/nginx/conf.d/{{ app_name }}.conf" backup=yes
+  notify:
+    - check nginx configuration
+    - reload nginx
+  tags:
+    - app:nginx
+
+- name: do blue/green logic
+  include: post_tasks.yml
+  when: bluegreen | bool
+
+# vim: set et fenc= ft=ansible sts=0 sw=2 ts=2 tw=0 :

@@ -1,0 +1,20 @@
+---
+- name: install nginx
+  yum: name=nginx state=latest
+  tags:
+    - nginx:install
+
+- name: ensure nginx is enabled at startup
+  service: name=nginx enabled=yes
+  tags:
+    - nginx:service
+
+- name: configure main nginx.conf
+  template: src=etc/nginx/nginx.conf.j2 dest=/etc/nginx/nginx.conf backup=yes force=yes
+  notify:
+    - check nginx configuration
+    - restart nginx
+  tags:
+    - nginx:config:main
+
+# vim: set et fenc=utf-8 ft=ansible sts=2 sw=2 ts=8 tw=0 :

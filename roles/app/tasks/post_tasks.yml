@@ -1,0 +1,19 @@
+---
+- name: store host facts
+  blockinfile:
+    dest: /etc/ansible/facts.d/{{ app_name }}.fact
+    create: yes
+    block: |
+      [{{ app_name }}]
+      env_color: {{ next_color }}
+      instances_count: {{ app_instances_count }}
+
+- name: stop old env containers
+  docker_container:
+    name: "{{ app_name }}_{{ current_color }}_{{ item }}"
+    state: stopped
+  with_sequence: count={{ current_count }}
+  ignore_errors: yes
+  when: first_run is not defined
+
+# vim: set et fenc= ft=ansible sts=2 sw=2 ts=2 tw=0 :

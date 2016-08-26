@@ -1,0 +1,45 @@
+user {{ nginx_user }};
+
+worker_processes  {{ nginx_worker_processes }};
+worker_rlimit_nofile 100000;
+
+error_log   /var/log/nginx/error.log warn;
+
+pid         /run/nginx.pid;
+
+events {
+    worker_connections  {{ nginx_worker_connections }};
+    use epoll;
+}
+
+http {
+    include         /etc/nginx/mime.types;
+    default_type    application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for" '
+                      '$request_time '
+                      '"$upstream_response_time" "$upstream_cache_status"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    client_body_buffer_size     128k;
+    client_max_body_size        {{ nginx_client_max_body_size }};
+    keepalive_timeout           65;
+
+    sendfile        on;
+    tcp_nopush      on;
+    tcp_nodelay     on;
+    server_tokens   off;
+    gzip            on;
+    gzip_static     on;
+    gzip_vary       on;
+    gzip_min_length 1025;
+    gzip_types      text/css text/plain application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript;
+    gzip_comp_level {{ nginx_gzip_level }};
+
+    include /etc/nginx/conf.d/*.conf;
+}
+
+# vim: set et fenc=utf-8 sts=4 sw=4 ts=4 tw=0 :

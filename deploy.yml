@@ -1,0 +1,11 @@
+---
+- hosts: all
+  vars_files:
+    - vars.yml
+
+  roles:
+    - {role: common , tags: common}
+    - {role: keepalived , tags: keepalived}
+    - {role: app , tags: app}
+
+# vim: set noet fenc= ft=ansible sts=0 sw=2 ts=2 tw=0 :
