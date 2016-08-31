@@ -10,7 +10,12 @@
     - common:facts
 
 - name: enable ipv4 forwarding
-  sysctl: name="net.ipv4.ip_forward" value=1 sysctl_set=yes state=present reload=yes
+  sysctl:
+    name: "net.ipv4.ip_forward"
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
   tags:
     - common:forwarding
 

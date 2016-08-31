@@ -5,7 +5,10 @@
     - keepalived:install
 
 - name: configure keepalived
-  template: src=etc/keepalived/keepalived.conf.j2 dest=/etc/keepalived/keepalived.conf backup=yes
+  template:
+    src: etc/keepalived/keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    backup: yes
   notify: restart keepalived
   tags:
     - keepalived:configure

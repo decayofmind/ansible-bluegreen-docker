@@ -3,7 +3,9 @@
   include: pre_tasks.yml
   when: bluegreen
 
-- debug: msg="DEPLOYING {{ app_name }}.{% if bluegreen %} Color of this deploy is {{ next_color| upper }}.{% endif %} Version is {{ app_version }}"
+- debug: msg="DEPLOYING {{ app_name }}.{% if bluegreen %}
+    Color of this deploy is {{ next_color| upper }}.{% endif %}
+    Version is {{ app_version }}"
   run_once: yes
   tags:
     - app:info
@@ -32,14 +34,20 @@
     - app:deploy
 
 - name: app health check
-  uri: url="http://{% if item.values()[0][0].HostIp == "0.0.0.0" %}127.0.0.1{% else %}{{ item.values()[0][0].HostIp }}{% endif %}:{{ item.values()[0][0].HostPort }}/{{ app_health_check_path | d('') }}" method=GET status_code=200
+  uri:
+    url: "http://{% if item.values()[0][0].HostIp == '0.0.0.0' %}127.0.0.1{% else %}{{ item.values()[0][0].HostIp }}{% endif %}:{{ item.values()[0][0].HostPort }}/{{ app_health_check_path | d('') }}"
+    method: GET
+    status_code: 200
   with_items:
     - "{{ app_ports }}"
   tags:
     - app:deploy
 
 - name: generate nginx config for app
-  template: src=etc/nginx/conf.d/app.conf.j2 dest="/etc/nginx/conf.d/{{ app_name }}.conf" backup=yes
+  template:
+    src: etc/nginx/conf.d/app.conf.j2
+    dest: "/etc/nginx/conf.d/{{ app_name }}.conf"
+    backup: yes
   notify:
     - check nginx configuration
     - reload nginx
