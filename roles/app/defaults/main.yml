@@ -1,7 +1,7 @@
 ---
-bluegreen: yes
+bluegreen: True
 default_color: green
-check_mode: no
+check_mode: False
 app_name: www
 app_repo:
 app_version: latest

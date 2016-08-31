@@ -7,5 +7,6 @@ app_name: trainingwheels
 app_repo: decayofmind/{{ app_name }}
 app_instances_count: 4
 env_name: default
+keepalived: True
 
 #  vim: set et fenc=utf-8 ft=yaml sts=2 sw=2 ts=2 tw=0 :

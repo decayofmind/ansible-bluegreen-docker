@@ -18,7 +18,9 @@ upstream app {
 
 server {
     listen       {{ ansible_default_ipv4['address'] }}:80       default_server ;
+{% if keepalived %}
     listen       {{ virtual_ip }}:80 ;
+{% endif %}
     server_name  {{ app_hostname }} _ "" ;
 
     proxy_buffering off;

@@ -1,9 +1,9 @@
 ---
 - name: do blue/green logic
   include: pre_tasks.yml
-  when: bluegreen | bool
+  when: bluegreen
 
-- debug: msg="DEPLOYING {{ app_name }}.{% if bluegreen | bool %} Color of this deploy is {{ next_color| upper }}.{% endif %} Version is {{ app_version }}"
+- debug: msg="DEPLOYING {{ app_name }}.{% if bluegreen %} Color of this deploy is {{ next_color| upper }}.{% endif %} Version is {{ app_version }}"
   run_once: yes
   tags:
     - app:info
@@ -11,7 +11,7 @@
 
 - name: deploy app
   docker_container:
-    name: "{{ app_name }}{% if bluegreen | bool %}_{{ next_color }}{% endif %}_{{ item }}"
+    name: "{{ app_name }}{% if bluegreen %}_{{ next_color }}{% endif %}_{{ item }}"
     state: started
     ports: all
     recreate: yes
@@ -49,6 +49,6 @@
 
 - name: do blue/green logic
   include: post_tasks.yml
-  when: bluegreen | bool
+  when: bluegreen
 
 # vim: set et fenc= ft=ansible sts=0 sw=2 ts=2 tw=0 :
