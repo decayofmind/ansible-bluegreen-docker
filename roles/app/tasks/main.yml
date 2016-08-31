@@ -25,11 +25,25 @@
   tags:
     - app:deploy
 
+- name: detect app ports
+  set_fact:
+    app_ports: "{{ deploy.results| map(attribute='ansible_facts.ansible_docker_container.NetworkSettings.Ports')| list }}"
+  tags:
+    - app:deploy
+
+- name: app health check
+  uri: url="http://{% if item.values()[0][0].HostIp == "0.0.0.0" %}127.0.0.1{% else %}{{ item.values()[0][0].HostIp }}{% endif %}:{{ item.values()[0][0].HostPort }}/{{ app_health_check_path | d('') }}" method=GET status_code=200
+  with_items:
+    - "{{ app_ports }}"
+  tags:
+    - app:deploy
+
 - name: generate nginx config for app
   template: src=etc/nginx/conf.d/app.conf.j2 dest="/etc/nginx/conf.d/{{ app_name }}.conf" backup=yes
   notify:
     - check nginx configuration
     - reload nginx
+    - make test request
   tags:
     - app:nginx
 

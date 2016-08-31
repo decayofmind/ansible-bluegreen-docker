@@ -2,9 +2,9 @@
 
 upstream app {
     #ip_hash;
-{% for result in deploy.results %}
-{% for k,v in result.ansible_facts.ansible_docker_container.NetworkSettings.Ports.iteritems() %}
-    server 127.0.0.1:{{ v[0].HostPort }};
+{% for port in app_ports %}
+{% for k,v in port.iteritems() %}
+    server {% if v[0].HostIp == "0.0.0.0" %}127.0.0.1{% else %}{{ v[0].HostIp }}{% endif %}:{{ v[0].HostPort }};
 {% endfor %}
 {% endfor %}
 {% if groups[env_name]|length > 1 %}

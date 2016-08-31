@@ -1,0 +1,5 @@
+---
+- name: make test request
+  uri: url="http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}/{{ app_health_check_path | d('') }}" method=GET status_code=200
+
+# vim: set et fenc= ft=ansible sts=2 sw=2 ts=2 tw=0 :
