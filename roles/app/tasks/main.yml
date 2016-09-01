@@ -17,7 +17,8 @@
     state: started
     ports: all
     recreate: yes
-    image: "{{ app_repo| d(app_name) }}:{{ app_version }}"
+    image: "{{ app_repo | d(app_name) }}:{{ app_version }}"
+    command: "{{ app_command | d() }}"
     restart_policy: unless-stopped
     env:
       REDIS_HOST: "{{ redis_host }}"
