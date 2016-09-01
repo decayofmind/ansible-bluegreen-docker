@@ -49,9 +49,17 @@
     dest: "/etc/nginx/conf.d/{{ app_name }}.conf"
     backup: yes
   notify:
-    - check nginx configuration
-    - reload nginx
     - make test request
+  tags:
+    - app:nginx
+
+- name: check nginx configuration
+  shell: "nginx -t -c /etc/nginx/nginx.conf"
+  tags:
+    - app:nginx
+
+- name: reload nginx
+  service: name=nginx state=reloaded
   tags:
     - app:nginx
 
