@@ -4,11 +4,6 @@
   tags:
     - nginx:install
 
-- name: ensure nginx is enabled at startup
-  service: name=nginx enabled=yes
-  tags:
-    - nginx:service
-
 - name: configure main nginx.conf
   template:
     src: etc/nginx/nginx.conf.j2
@@ -20,5 +15,10 @@
     - restart nginx
   tags:
     - nginx:config:main
+
+- name: ensure nginx is started enabled at startup
+  service: name=nginx state=started enabled=yes
+  tags:
+    - nginx:service
 
 # vim: set et fenc=utf-8 ft=ansible sts=2 sw=2 ts=8 tw=0 :
