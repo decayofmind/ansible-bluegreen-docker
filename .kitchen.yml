@@ -1,12 +1,10 @@
 ---
-
 provisioner:
   name: ansible_playbook
   hosts: test-kitchen
   require_chef_for_busser: false
   require_ruby_for_busser: true
-  #requirements_path: requirements.yml
-  #require_ansible_repo: true
+  #require_ansible_repo: false
   require_ansible_source: true
   ansible_source_rev: devel
   require_pip: true
