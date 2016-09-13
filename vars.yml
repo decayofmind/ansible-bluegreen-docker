@@ -6,6 +6,7 @@ app_hostname: localhost
 app_name: trainingwheels
 app_repo: decayofmind/{{ app_name }}
 app_instances_count: 4
+app_private_registry: False
 env_name: default
 keepalived: True
 

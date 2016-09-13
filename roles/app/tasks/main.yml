@@ -3,6 +3,15 @@
   include: pre_tasks.yml
   when: bluegreen
 
+- name: log into private docker registry
+  docker_login:
+    username: {{ app_registry_username| d(lookup('env', 'REGISTRY_PULL_USERNAME')) }}
+    password: {{ app_registry_password| d(lookup('env', 'REGISTRY_PULL_PASSWORD')) }}
+    reauthorize: yes
+  when: app_private_registry
+  tags:
+    - app:registry
+
 - debug: msg="DEPLOYING {{ app_name }}.{% if bluegreen %}
     Color of this deploy is {{ next_color| upper }}.{% endif %}
     Version is {{ app_version }}"
