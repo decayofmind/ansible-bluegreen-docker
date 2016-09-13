@@ -1,4 +1,9 @@
 ---
+- name: upgrade system
+  yum: name=* state=latest
+  tags:
+    - common:upgrade
+
 - name: ensure facts.d dir exists
   file: path=/etc/ansible/facts.d state=directory
   tags:

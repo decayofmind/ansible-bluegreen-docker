@@ -33,7 +33,6 @@
     env:
       REDIS_HOST: "{{ redis_host }}"
   with_sequence: count={{ app_instances_count }}
-  check_mode: "{{ check_mode }}"
   register: deploy
   tags:
     - app:deploy
