@@ -5,8 +5,8 @@
 
 - name: log into private docker registry
   docker_login:
-    username: {{ app_registry_username| d(lookup('env', 'REGISTRY_PULL_USERNAME')) }}
-    password: {{ app_registry_password| d(lookup('env', 'REGISTRY_PULL_PASSWORD')) }}
+    username: "{{ app_registry_username| d(lookup('env', 'REGISTRY_PULL_USERNAME')) }}"
+    password: "{{ app_registry_password| d(lookup('env', 'REGISTRY_PULL_PASSWORD')) }}"
     reauthorize: yes
   when: app_private_registry
   tags:
