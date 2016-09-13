@@ -4,6 +4,7 @@ redis_host: 192.168.122.253
 
 app_hostname: localhost
 app_name: trainingwheels
+app_registry:
 app_repo: decayofmind/{{ app_name }}
 app_instances_count: 4
 app_private_registry: False
