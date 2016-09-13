@@ -14,6 +14,6 @@
     state: stopped
   with_sequence: count={{ current_count }}
   ignore_errors: yes
-  when: first_run is not defined
+  when: not first_run
 
 # vim: set et fenc= ft=ansible sts=2 sw=2 ts=2 tw=0 :
