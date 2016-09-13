@@ -5,6 +5,9 @@
 - name: install docker-engine
   yum: name=docker-engine
 
+- name: install epel-release
+  yum: name=epel-release
+
 - name: install python-pip
   yum: name=python-pip
 
