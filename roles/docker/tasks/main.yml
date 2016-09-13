@@ -8,8 +8,11 @@
 - name: install epel-release
   yum: name=epel-release
 
-- name: install python-pip
-  yum: name=python-pip
+- name: install deps
+  yum: name="{{ item }}"
+  with_items:
+    - python-pip
+    - git
 
 - name: install docker-py
   pip: name=docker-py
