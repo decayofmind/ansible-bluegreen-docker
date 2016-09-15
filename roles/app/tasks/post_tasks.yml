@@ -15,5 +15,7 @@
   with_sequence: count={{ current_count }}
   ignore_errors: yes
   when: not first_run
+  tags:
+    - skip_ansible_lint
 
 # vim: set et fenc= ft=ansible sts=2 sw=2 ts=2 tw=0 :
