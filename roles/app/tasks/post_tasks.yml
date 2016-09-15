@@ -12,7 +12,7 @@
   docker_container:
     name: "{{ app_name }}_{{ current_color }}_{{ item }}"
     state: stopped
-  with_sequence: "{{ count={{ current_count }} }}"
+  with_sequence: count={{ current_count }}
   ignore_errors: yes
   when: not first_run
 
