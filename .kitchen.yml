@@ -1,11 +1,4 @@
 ---
-driver:
-  name: vagrant
-  customize:
-    memory: 512
-    usb: "off"
-  network:
-    - ["private_network", {ip: "192.168.122.253"}]
 
 provisioner:
   name: ansible_playbook
@@ -13,14 +6,13 @@ provisioner:
   require_chef_for_busser: false
   require_ruby_for_busser: true
   #requirements_path: requirements.yml
-  #require_ansible_repo: false
+  #require_ansible_repo: true
   require_ansible_source: true
   ansible_source_rev: devel
   require_pip: true
   roles_path: roles
   recursive_additional_copy_path:
     - vars.yml
-    - redis.yml
   extra_vars:
     env_name: test-kitchen
     keepalived: false
@@ -29,7 +21,18 @@ provisioner:
   ansible_extra_flags: <%= ENV['ANSIBLE_EXTRA_FLAGS'] %>
 
 platforms:
-  - name: minimal/centos7
+  - name: vagrant-centos7
+    driver:
+      name: vagrant
+      box: minimal/centos7
+      provision: true
+      customize:
+        memory: 512
+        usb: "off"
+      network:
+        - ["private_network", {ip: "192.168.122.253"}]
+      vagrantfiles:
+        - .vagrant.rb
 
 suites:
   - name: default
