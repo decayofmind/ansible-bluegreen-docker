@@ -38,6 +38,7 @@
       register: deploy
       tags:
         - app:deploy
+        - skip_ansible_lint
   rescue:
     - name: cleanup dead containers
       command: docker rm -f $(docker ps -aq -f status=dead)
@@ -69,9 +70,10 @@
     - app:nginx
 
 - name: check nginx configuration
-  shell: "nginx -t -c /etc/nginx/nginx.conf"
+  command: nginx -t -c /etc/nginx/nginx.conf
   tags:
     - app:nginx
+    - skip_ansible_lint
 
 - name: reload nginx
   service: name=nginx state=reloaded

@@ -1,6 +1,6 @@
 ---
 - name: install keepalived
-  yum: name=keepalived state=latest
+  yum: name=keepalived
   tags:
     - keepalived:install
 
