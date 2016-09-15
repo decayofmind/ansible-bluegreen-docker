@@ -2,7 +2,6 @@
 - hosts: all
   vars_files:
     - vars.yml
-  pre_tasks:
-    - include: redis.yml
   roles:
+    - redis_container
     - app
