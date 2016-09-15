@@ -1,0 +1,10 @@
+---
+- name: deploy redis container
+  docker_container:
+    name: redis
+    state: started
+    ports: "6379:6379"
+    image: redis:alpine
+    restart_policy: unless-stopped
+
+# vim: set et fenc= ft=ansible sts=2 sw=2 ts=2 tw=0 :

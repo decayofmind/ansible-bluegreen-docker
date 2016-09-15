@@ -1,3 +1,2 @@
 ---
-- include: redis.yml
-- include: deploy.yml
+- include: deployment.yml

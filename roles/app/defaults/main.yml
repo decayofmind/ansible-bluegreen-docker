@@ -7,6 +7,7 @@ app_repo:
 app_version: latest
 app_instances_count: 2
 app_hostname: localhost
+app_private_registry: False
 
 first_run: True
 
