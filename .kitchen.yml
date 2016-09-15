@@ -34,3 +34,7 @@ platforms:
 
 suites:
   - name: default
+
+# Fix for: https://github.com/neillturner/kitchen-ansible/issues/66
+verifier:
+  ruby_bindir: '/usr/bin'
