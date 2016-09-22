@@ -34,7 +34,7 @@
         etc_hosts: "{{ app_etc_hosts | d({}) }}"
         log_driver: journald
         log_options:
-          labels: "{{ app_name }}"
+          tag: "{{ app_name }}"
         env: "{{ app_env | d({}) }}"
       with_sequence: count={{ app_instances_count }}
       check_mode: "{{ check_mode }}"
