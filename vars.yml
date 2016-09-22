@@ -1,7 +1,8 @@
 ---
 virtual_ip: 192.168.122.200
-redis_host: 192.168.122.253
 
+app_env:
+  REDIS_HOST: 192.168.122.253
 app_hostname: localhost
 app_name: trainingwheels
 app_registry:
