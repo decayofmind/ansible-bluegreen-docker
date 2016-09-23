@@ -1,0 +1,33 @@
+---
+- name: modprobe overlay
+  modprobe: name=overlay state=present
+
+- name: add overlay module to autoload
+  copy:
+    src: etc/modules-load.d/overlay.conf
+    dest: /etc/modules-load.d/overlay.conf
+
+- name: check if overlay isn't already enabled
+  stat: path=/etc/systemd/system/docker.service.d/overlay.conf
+  register: overlay_enabled
+
+- name: place start command with storage-driver configuration
+  copy:
+    src: etc/systemd/system/docker.service.d/overlay.conf
+    dest: /etc/systemd/system/docker.service.d/overlay.conf
+
+- block:
+  - name: stop docker service
+    service: name=docker state=stopped
+
+  - name: cleanup /var/lib/docker
+    command: rm -rf /var/lib/docker/*
+    tags:
+      - skip_ansible_lint
+
+  - name: start docker service
+    service: name=docker state=started
+
+  when: not overlay_enabled.stat.exists
+
+# vim: set et fenc= ft=ansible sts=2 sw=2 ts=2 tw=0 :

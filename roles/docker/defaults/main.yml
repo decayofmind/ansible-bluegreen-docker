@@ -1,0 +1,4 @@
+---
+docker_use_overlay: true
+
+# vim: set et fenc= ft=ansible sts=2 sw=2 ts=2 tw=0 :

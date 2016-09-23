@@ -24,8 +24,15 @@
 - name: install docker-custodian
   pip: name='git+https://github.com/Yelp/docker-custodian.git' editable=false
 
+- name: ensure docker.service.d dir exists
+  file: path=/etc/systemd/system/docker.service.d state=directory
+
 - name: enable docker service
   service: name=docker enabled=yes
+
+- name: setup overlay storage driver
+  include: overlay.yml
+  when: docker_use_overlay
 
 - name: start docker service
   service: name=docker state=started

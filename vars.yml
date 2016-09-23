@@ -8,8 +8,11 @@ app_name: trainingwheels
 app_registry:
 app_repo: decayofmind/{{ app_name }}
 app_instances_count: 4
-app_private_registry: False
+app_private_registry: false
+
 env_name: default
-keepalived: True
+
+docker_use_overlay: false
+keepalived: true
 
 #  vim: set et fenc=utf-8 ft=yaml sts=2 sw=2 ts=2 tw=0 :
