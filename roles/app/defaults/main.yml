@@ -1,14 +1,14 @@
 ---
-bluegreen: True
+bluegreen: true
 default_color: green
-check_mode: False
+check_mode: false
 app_name: www
 app_repo:
 app_version: latest
 app_instances_count: 2
 app_hostname: localhost
-app_private_registry: False
+app_private_registry: false
 
-first_run: True
+first_run: false
 
 # vim: set et fenc= ft=ansible sts=2 sw=2 ts=2 tw=0 :
