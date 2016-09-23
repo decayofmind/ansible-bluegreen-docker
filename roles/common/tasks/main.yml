@@ -12,7 +12,9 @@
     - common:facts
 
 - name: put dummy fact to local facts dir
-  file: path=/etc/ansible/facts.d/dummy.fact state=touch
+  copy:
+    src: etc/ansible/facts.d/dummy.fact
+    dest: /etc/ansible/facts.d/dummy.fact
   tags:
     - common:facts
 
