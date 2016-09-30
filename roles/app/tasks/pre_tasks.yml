@@ -16,6 +16,10 @@
   set_fact: current_count={{ ansible_local[app_name][app_name].instances_count }}
   when: not first_run
 
+- name: determine current version
+  set_fact: current_version={{ ansible_local[app_name][app_name].version }}
+  when: not first_run
+
 - name: set current color if not in facts
   set_fact: current_color={{ default_color }}
   when: first_run
@@ -31,5 +35,9 @@
 - name: set new color
   set_fact: next_color="green"
   when: current_color == "blue"
+
+- name: don't change color if deploying same version
+  set_fact: next_color="{{ current_color }}"
+  when: (not first_run) and (current_version == app_version)
 
 # vim: set et fenc= ft=ansible sts=0 sw=2 ts=2 tw=0 :
