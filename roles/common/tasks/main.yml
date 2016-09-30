@@ -6,6 +6,16 @@
     - common:upgrade
     - skip_ansible_lint
 
+- name: install libselinux-python
+  yum: name=libselinux-python
+  tags:
+    - common:selinux
+
+- name: disable SELinux
+  selinux: state=disabled
+  tags:
+    - common:selinux
+
 - name: ensure facts.d dir exists
   file: path=/etc/ansible/facts.d state=directory
   tags:
