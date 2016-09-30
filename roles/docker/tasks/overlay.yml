@@ -26,7 +26,7 @@
       - skip_ansible_lint
 
   - name: start docker service
-    service: name=docker state=started
+    service: name=docker daemon_reload=yes state=started
 
   when: not overlay_enabled.stat.exists
 
