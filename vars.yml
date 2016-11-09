@@ -3,7 +3,9 @@ virtual_ip: 192.168.122.200
 
 app_env:
   REDIS_HOST: 192.168.122.253
+
 app_hostname: localhost
+app_port: 5000
 app_name: trainingwheels
 app_registry:
 app_repo: decayofmind/{{ app_name }}
