@@ -4,10 +4,18 @@ vrrp_script chk_nginx {
 }
 
 vrrp_instance VI_1 {
-    state {% if keepalived_master is defined %}MASTER{% else %}SLAVE{% endif %}
     interface {{ ansible_default_ipv4['interface'] }}
+
+    track_interface {
+        {{ ansible_default_ipv4['interface']  }}
+    }
+
+    state {% if keepalived_master is defined %}MASTER{% else %}BACKUP{% endif %}
+
     virtual_router_id {{ keepalived_vrid }}
+
     priority {% if keepalived_master is defined %}200{% else %}100{% endif %}
+
     authentication {
         auth_type PASS
         auth_pass {{ keepalived_password }}
@@ -16,11 +24,11 @@ vrrp_instance VI_1 {
         {{ virtual_ip }}
     }
 
-    unicast_src_ip {% for host in groups[env_name] %}{% if hostvars[host]['keepalived_master'] is defined %}{{ hostvars[host]['ansible_default_ipv4']['address'] }}{% endif %}{% endfor %}
+    unicast_src_ip {% for host in groups['app'] %}{% if hostvars[host]['keepalived_master'] is defined %}{{ hostvars[host]['ansible_default_ipv4']['address'] }}{% endif %}{% endfor %}
 
 
     unicast_peer {
-                {% for host in groups[env_name] %}{% if hostvars[host]['keepalived_master'] is not defined %}{{ hostvars[host]['ansible_default_ipv4']['address']  }}{% endif %}{% endfor %}
+                {% for host in groups['app'] %}{% if hostvars[host]['keepalived_master'] is not defined %}{{ hostvars[host]['ansible_default_ipv4']['address']  }}{% endif %}{% endfor %}
     }
 
 
