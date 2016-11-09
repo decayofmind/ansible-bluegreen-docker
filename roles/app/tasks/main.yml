@@ -26,7 +26,7 @@
       docker_container:
         name: "{{ app_name }}{% if bluegreen %}_{{ next_color }}{% endif %}_{{ item }}"
         state: started
-        ports: all
+        ports: "{{ port_prefix }}{{ item }}:{{ app_port }}"
         image: "{{ app_repo | d(app_name) }}:{{ app_version }}"
         command: "{{ app_command | d() }}"
         restart_policy: unless-stopped

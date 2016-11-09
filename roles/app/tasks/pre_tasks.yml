@@ -36,6 +36,14 @@
   set_fact: next_color="green"
   when: current_color == "blue"
 
+- name: set port_prefix
+  set_fact: port_prefix={{ port_prefix_blue }}
+  when: current_color == "green"
+
+- name: set port_prefix
+  set_fact: port_prefix={{ port_prefix_green }}
+  when: current_color == "blue"
+
 - name: don't change color if deploying same version
   set_fact: next_color="{{ current_color }}"
   when: (not first_run) and (current_version == app_version)
