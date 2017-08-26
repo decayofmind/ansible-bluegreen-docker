@@ -1,5 +1,9 @@
 #/bin/bash
 
+COLORS_ON=1
+
+. lib.sh || exit 1
+
 section "Tasks in this role:"
 ansible-playbook -i hosts playbook.yml --list-tasks
 
