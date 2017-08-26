@@ -6,12 +6,6 @@ app_env:
 app_etc_hosts:
   redis: "{{ ansible_default_ipv4.address }}"
 
-app_hostname: localhost
-app_port: 5000
-app_name: trainingwheels
-app_registry:
 app_image: "decayofmind/{{ app_name }}"
-app_instances_count: 4
-app_private_registry: false
 
 #  vim: set et fenc=utf-8 ft=yaml sts=2 sw=2 ts=2 tw=0 :

@@ -21,6 +21,7 @@ install:
 - sudo pip install molecule
 - ansible --version
 - molecule --version
+- cd tests
 
 before_script:
 - docker run -d --net=host redis
@@ -28,4 +29,4 @@ before_script:
 - sudo service nginx start
 
 script:
-- ansible-playbook -i inventory playbook.yml
+- ansible-playbook -i hosts playbook.yml

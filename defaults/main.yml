@@ -2,7 +2,9 @@
 app_bluegreen: True
 app_balancing: True
 
-app_name: www
+app_group: all
+
+app_name: trainingwheels
 app_repo:
 app_nginx_upstream: "{{ app_name }}"
 app_nginx_ip_hash: False
@@ -11,7 +13,6 @@ app_port: 5000
 app_version: latest
 app_instances_count: 2
 app_hostname: localhost
-app_private_registry: False
 
 app_command: ""
 app_etc_hosts: {}

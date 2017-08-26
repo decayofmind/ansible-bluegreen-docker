@@ -5,7 +5,7 @@ upstream {{ app_nginx_upstream }} {
     ip_hash;
     {% endif %}
 
-    {% for host in groups['app'] -%}
+    {% for host in groups[app_group] -%}
     {% for port in hostvars[host]['app_ports'] -%}
     {% for k,v in port.iteritems() -%}
     {% if v -%}
