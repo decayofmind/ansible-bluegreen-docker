@@ -21,7 +21,7 @@
   when: not first_run
 
 - name: set current color if not in facts
-  set_fact: current_color={{ default_color }}
+  set_fact: current_color={{ _default_color }}
   when: first_run
 
 - name: determine current count of instances if not in facts

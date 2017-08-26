@@ -6,9 +6,12 @@
     - common:facts
 
 - name: put dummy fact to local facts dir
-  copy:
-    src: etc/ansible/facts.d/dummy.fact
+  lineinfile:
     dest: /etc/ansible/facts.d/dummy.fact
+    line: '{ "fact": true }'
+    regexp: '^{ "fact": true }'
+    create: yes
+    state: present
   tags:
     - common:facts
 
