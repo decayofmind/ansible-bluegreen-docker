@@ -24,6 +24,7 @@ install:
 
 before_script:
 - docker run -d --net=host redis
+- sudo apt-get install -y nginx
 
 script:
 - ansible-playbook -i inventory playbook.yml

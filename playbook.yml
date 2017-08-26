@@ -2,5 +2,4 @@
 - hosts: app
   become: True
   roles:
-    - nginx
     - app

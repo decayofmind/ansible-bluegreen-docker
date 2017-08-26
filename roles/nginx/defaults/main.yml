@@ -1,8 +1,0 @@
----
-nginx_user: nginx
-nginx_gzip_level: 4
-nginx_worker_processes: "{{ ansible_processor_vcpus*4 }}"
-nginx_worker_connections: "{{ 1024*nginx_worker_processes | int }}"
-nginx_client_max_body_size: 200m
-
-# vim: set et fenc=utf-8 ft=ansible sts=2 sw=2 ts=8 tw=0 :

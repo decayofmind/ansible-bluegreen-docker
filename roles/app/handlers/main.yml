@@ -1,4 +1,14 @@
 ---
+- name: check nginx configuration
+  command: nginx -t -c /etc/nginx/nginx.conf
+  register: result
+  changed_when: "result.rc != 0"
+
+- name: reload nginx
+  service:
+    name: nginx
+    state: reloaded
+
 - name: make test request
   uri: url="http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}/{{ app_health_check_path | d('') }}" method=GET status_code=200
   tags:
