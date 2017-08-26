@@ -2,4 +2,4 @@
 - hosts: all
   become: True
   roles:
-    - ../
+    - ansible-bluegreen-docker
