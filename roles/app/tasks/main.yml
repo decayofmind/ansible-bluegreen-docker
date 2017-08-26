@@ -1,7 +1,9 @@
 ---
 
 - name: ensure facts.d dir exists
-  file: path=/etc/ansible/facts.d state=directory
+  file:
+    path: /etc/ansible/facts.d
+    state: directory
   tags:
     - common:facts
 
@@ -28,7 +30,7 @@
     - app:cleanup
 
 - local_action: debug msg="DEPLOYING {{ app_name }}.{% if app_bluegreen %}
-      Color of this deploy is {{ next_color | upper }}.{% endif %}
+      Color of this deploy is {{ _next_color | upper }}.{% endif %}
       Version is {{ app_version }}"
   run_once: yes
   tags:
@@ -42,9 +44,9 @@
 
   - name: deploy app
     docker_container:
-      name: "{{ app_name }}{% if app_bluegreen %}_{{ next_color }}{% endif %}_{{ item }}"
+      name: "{{ app_name }}{% if app_bluegreen %}_{{ _next_color }}{% endif %}_{{ item }}"
       state: started
-      ports: "{{ port_prefix }}{{ item  }}:{{ app_port  }}"
+      ports: "{{ app_port_prefix }}{{ item  }}:{{ app_port  }}"
       image: "{{ app_image | d(app_name) }}:{{ app_version }}"
       command: "{{ app_command }}"
       restart_policy: unless-stopped
@@ -54,7 +56,7 @@
       env: "{{ app_env }}"
       volumes: "{{ app_volumes }}"
     with_sequence: count={{ app_instances_count }}
-    check_mode: "{{ check_mode }}"
+    check_mode: "{{ app_check_mode }}"
     register: deploy
     tags:
       - app:deploy
@@ -86,26 +88,14 @@
     backup: yes
   when: app_balancing
   register: _nginx_config
+  notify:
+    - check nginx configuration
+    - reload nginx
   tags:
     - app:nginx
-    - skip_ansible_lint
 
-- block:
-  - name: check nginx configuration
-    command: nginx -t -c /etc/nginx/nginx.conf
-    changed_when: False
-    tags:
-      - app:nginx
-      - skip_ansible_lint
-
-  - name: reload nginx
-    service: name=nginx state=reloaded
-    tags:
-      - app:nginx
-      - skip_ansible_lint
-  when:
-    - _nginx_config.changed
-    - app_balancing
+- name: fire handlers
+  meta: flush_handlers
 
 - name: do blue/green logic
   include: post_tasks.yml

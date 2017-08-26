@@ -1,49 +1,62 @@
 ---
 - name: check very first run
-  set_fact: first_run=true
+  set_fact:
+    app_first_run: True
   when: ansible_local is not defined
 
 - name: check first run
-  set_fact: first_run=true
+  set_fact:
+    app_first_run: True
   when: ansible_local[app_name] is not defined
   ignore_errors: yes
 
-- name: determine current color
-  set_fact: current_color={{ ansible_local[app_name][app_name].env_color }}
-  when: not first_run
+- block:
+  - name: determine current color
+    set_fact:
+      _current_color: "{{ ansible_local[app_name][app_name].env_color }}"
 
-- name: determine current count of instances
-  set_fact: current_count={{ ansible_local[app_name][app_name].instances_count }}
-  when: not first_run
+  - name: determine current count of instances
+    set_fact:
+      _current_count: "{{ ansible_local[app_name][app_name].instances_count }}"
 
-- name: determine current version
-  set_fact: current_version={{ ansible_local[app_name][app_name].version }}
-  when: not first_run
+  - name: determine current version
+    set_fact:
+      _current_version: "{{ ansible_local[app_name][app_name].version }}"
+  when: not app_first_run
 
-- name: set current color if not in facts
-  set_fact: current_color={{ _default_color }}
-  when: first_run
+- block:
+  - name: set current color if not in facts
+    set_fact:
+      _current_color: "{{ app_default_color }}"
 
-- name: determine current count of instances if not in facts
-  set_fact: current_count={{ app_instances_count }}
-  when: first_run
+  - name: determine current count of instances if not in facts
+    set_fact:
+      _current_count: "{{ app_instances_count }}"
+  when: app_first_run
 
 - name: set new color
-  set_fact: next_color="blue"
-  when: current_color == "green"
+  set_fact:
+    _next_color: "blue"
+  when: _current_color == "green"
 
 - name: set new color
-  set_fact: next_color="green"
-  when: current_color == "blue"
+  set_fact:
+    _next_color: "green"
+  when: _current_color == "blue"
 
 - name: don't change color if deploying same version
-  set_fact: next_color="{{ current_color }}"
-  when: (not first_run) and (current_version == app_version)
+  set_fact:
+    _next_color: "{{ _current_color }}"
+  when:
+    - not app_first_run
+    - _current_version == app_version
 
 - name: set port_prefix for blue
-  set_fact: port_prefix={{ port_prefix_blue }}
-  when: next_color == "blue"
+  set_fact:
+    app_port_prefix: "{{ app_port_prefix_blue }}"
+  when: _next_color == "blue"
 
 - name: set port_prefix for green
-  set_fact: port_prefix={{ port_prefix_green }}
-  when: next_color == "green"
+  set_fact:
+    app_port_prefix: "{{ app_port_prefix_green }}"
+  when: _next_color == "green"

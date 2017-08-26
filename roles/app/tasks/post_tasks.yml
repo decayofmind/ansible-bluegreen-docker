@@ -15,11 +15,13 @@
 
 - name: stop old env containers
   docker_container:
-    name: "{{ app_name }}_{{ current_color }}_{{ item }}"
+    name: "{{ app_name }}_{{ _current_color }}_{{ item }}"
     state: stopped
-  with_sequence: count={{ current_count }}
+  with_sequence: count={{ _current_count }}
   ignore_errors: yes
-  when: (not first_run) and (app_version != current_version)
+  when:
+    - not app_first_run
+    - app_version != _current_version
   tags:
     - skip_ansible_lint
 
