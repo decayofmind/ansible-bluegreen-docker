@@ -1,53 +1,68 @@
 ---
+
+- name: ensure facts.d dir exists
+  file: path=/etc/ansible/facts.d state=directory
+  tags:
+    - common:facts
+
+- name: put dummy fact to local facts dir
+  copy:
+    src: etc/ansible/facts.d/dummy.fact
+    dest: /etc/ansible/facts.d/dummy.fact
+  tags:
+    - common:facts
+
 - name: do blue/green logic
   include: pre_tasks.yml
-  when: bluegreen
+  when: app_bluegreen
 
-- name: log into private docker registry
-  docker_login:
-    registry: "{{ app_registry }}"
-    username: "{{ app_registry_username| d(lookup('env', 'REGISTRY_PULL_USERNAME')) }}"
-    password: "{{ app_registry_password| d(lookup('env', 'REGISTRY_PULL_PASSWORD')) }}"
-    reauthorize: yes
-  when: app_private_registry
+- name: cleanup dead containers
+  shell: docker rm -f $(docker ps -a -q -f status=dead)
+  register: dead_conts
+  ignore_errors: yes
+  changed_when: dead_conts.stdout != ""
   tags:
-    - app:registry
+    - app:cleanup
 
-- debug: msg="DEPLOYING {{ app_name }}.{% if bluegreen %}
-    Color of this deploy is {{ next_color| upper }}.{% endif %}
-    Version is {{ app_version }}"
+- local_action: debug msg="DEPLOYING {{ app_name }}.{% if app_bluegreen %}
+      Color of this deploy is {{ next_color | upper }}.{% endif %}
+      Version is {{ app_version }}"
   run_once: yes
   tags:
     - app:info
     - app:deploy
 
 - block:
-    - name: deploy app
-      docker_container:
-        name: "{{ app_name }}{% if bluegreen %}_{{ next_color }}{% endif %}_{{ item }}"
-        state: started
-        ports: "{{ port_prefix }}{{ item }}:{{ app_port }}"
-        image: "{{ app_repo | d(app_name) }}:{{ app_version }}"
-        command: "{{ app_command | d() }}"
-        restart_policy: unless-stopped
-        etc_hosts: "{{ app_etc_hosts | d({}) }}"
-        log_driver: journald
-        log_options:
-          tag: "{{ app_name }}"
-        env: "{{ app_env | d({}) }}"
-      with_sequence: count={{ app_instances_count }}
-      check_mode: "{{ check_mode }}"
-      register: deploy
-      tags:
-        - app:deploy
-        - skip_ansible_lint
+  - name: debug port_prefix value
+    debug:
+      var: port_prefix
+
+  - name: deploy app
+    docker_container:
+      name: "{{ app_name }}{% if app_bluegreen %}_{{ next_color }}{% endif %}_{{ item }}"
+      state: started
+      ports: "{{ port_prefix }}{{ item  }}:{{ app_port  }}"
+      image: "{{ app_image | d(app_name) }}:{{ app_version }}"
+      command: "{{ app_command }}"
+      restart_policy: unless-stopped
+      etc_hosts: "{{ app_etc_hosts }}"
+      log_driver: "{{ app_log_driver }}"
+      log_options: "{{ app_log_options }}"
+      env: "{{ app_env }}"
+      volumes: "{{ app_volumes }}"
+    with_sequence: count={{ app_instances_count }}
+    check_mode: "{{ check_mode }}"
+    register: deploy
+    tags:
+      - app:deploy
+      - skip_ansible_lint
   rescue:
     - name: cleanup dead containers
-      command: docker rm -f $(docker ps -aq -f status=dead)
+      shell: docker rm -f $(docker ps -a -q -f status=dead)
 
 - name: detect app ports
   set_fact:
-    app_ports: "{{ deploy.results| map(attribute='ansible_facts.ansible_docker_container.NetworkSettings.Ports')| list }}"
+    app_ports: "{{ deploy.results| map(attribute='ansible_facts.docker_container.NetworkSettings.Ports')| list }}"
   tags:
     - app:deploy
 
@@ -66,28 +81,29 @@
     src: etc/nginx/conf.d/app.conf.j2
     dest: "/etc/nginx/conf.d/{{ app_name }}.conf"
     backup: yes
-  when: deploy.changed
-  notify:
-    - make test request
-  tags:
-    - app:nginx
-
-- name: check nginx configuration
-  command: nginx -t -c /etc/nginx/nginx.conf
-  register: result
-  changed_when: "result.rc != 0"
+  when: app_balancing
+  register: _nginx_config
   tags:
     - app:nginx
     - skip_ansible_lint
 
-- name: reload nginx
-  service: name=nginx state=reloaded
-  when: deploy.changed
-  tags:
-    - app:nginx
+- block:
+  - name: check nginx configuration
+    command: nginx -t -c /etc/nginx/nginx.conf
+    changed_when: False
+    tags:
+      - app:nginx
+      - skip_ansible_lint
+
+  - name: reload nginx
+    service: name=nginx state=reloaded
+    tags:
+      - app:nginx
+      - skip_ansible_lint
+  when:
+    - _nginx_config.changed
+    - app_balancing
 
 - name: do blue/green logic
   include: post_tasks.yml
-  when: bluegreen
-
-# vim: set et fenc= ft=ansible sts=0 sw=2 ts=2 tw=0 :
+  when: app_bluegreen

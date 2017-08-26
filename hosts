@@ -1,6 +1,0 @@
-[default]
-192.168.122.213 keepalived_master=yes
-192.168.122.253
-
-[redis]
-192.168.122.253

@@ -9,6 +9,10 @@
       instances_count: {{ app_instances_count }}
       version: {{ app_version }}
 
+- name: reload ansible_local
+  setup:
+    filter: ansible_local
+
 - name: stop old env containers
   docker_container:
     name: "{{ app_name }}_{{ current_color }}_{{ item }}"

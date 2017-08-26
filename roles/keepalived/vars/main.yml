@@ -1,5 +1,0 @@
----
-keepalived_vrid: 53
-keepalived_password: 79f53eb4
-
-# vim: set et fenc= ft=ansible sts=2 sw=2 ts=2 tw=0 :

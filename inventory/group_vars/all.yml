@@ -1,20 +1,17 @@
 ---
-virtual_ip: 192.168.122.200
 
 app_env:
-  REDIS_HOST: 192.168.122.253
+  REDIS_HOST: redis
+
+app_etc_hosts:
+  redis: "{{ ansible_default_ipv4.address }}"
 
 app_hostname: localhost
 app_port: 5000
 app_name: trainingwheels
 app_registry:
-app_repo: decayofmind/{{ app_name }}
+app_repo: "decayofmind/{{ app_name }}"
 app_instances_count: 4
 app_private_registry: false
-
-env_name: default
-
-docker_use_overlay: false
-keepalived: true
 
 #  vim: set et fenc=utf-8 ft=yaml sts=2 sw=2 ts=2 tw=0 :

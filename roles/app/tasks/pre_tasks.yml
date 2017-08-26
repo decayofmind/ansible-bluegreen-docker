@@ -36,6 +36,10 @@
   set_fact: next_color="green"
   when: current_color == "blue"
 
+- name: don't change color if deploying same version
+  set_fact: next_color="{{ current_color }}"
+  when: (not first_run) and (current_version == app_version)
+
 - name: set port_prefix for blue
   set_fact: port_prefix={{ port_prefix_blue }}
   when: next_color == "blue"
@@ -43,9 +47,3 @@
 - name: set port_prefix for green
   set_fact: port_prefix={{ port_prefix_green }}
   when: next_color == "green"
-
-- name: don't change color if deploying same version
-  set_fact: next_color="{{ current_color }}"
-  when: (not first_run) and (current_version == app_version)
-
-# vim: set et fenc=utf-8 ft=ansible sts=0 sw=2 ts=2 tw=0 :

@@ -1,6 +1,7 @@
 ---
 - name: install nginx
-  yum: name=nginx
+  apt:
+    name: nginx
   tags:
     - nginx:install
 
@@ -17,7 +18,10 @@
     - nginx:config:main
 
 - name: ensure nginx is started enabled at startup
-  service: name=nginx state=started enabled=yes
+  service:
+    name: nginx
+    state: started
+    enabled: yes
   tags:
     - nginx:service
 

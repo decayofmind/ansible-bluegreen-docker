@@ -1,26 +1,23 @@
 # {{ ansible_managed }}
 
-upstream app {
-    #ip_hash;
-{% for port in app_ports %}
-{% for k,v in port.iteritems() %}
-    server {% if v[0].HostIp == "0.0.0.0" %}127.0.0.1{% else %}{{ v[0].HostIp }}{% endif %}:{{ v[0].HostPort }};
-{% endfor %}
-{% endfor %}
-{% if groups[env_name]|length > 1 %}
-{% for host in groups[env_name] %}
-{% if host != inventory_hostname %}
-    server {{ hostvars[host]['ansible_default_ipv4']['address'] }}:80;
-{% endif %}
-{% endfor %}
-{% endif %}
+upstream {{ app_nginx_upstream }} {
+    {% if app_nginx_ip_hash -%}
+    ip_hash;
+    {% endif %}
+
+    {% for host in groups['app'] -%}
+    {% for port in hostvars[host]['app_ports'] -%}
+    {% for k,v in port.iteritems() -%}
+    {% if v -%}
+        server {% if v[0].HostIp == "0.0.0.0" -%}{{ hostvars[host]['ansible_default_ipv4']['address']  }}{% else -%}{{ v[0].HostIp  }}{% endif %}:{{ v[0].HostPort  }};
+    {% endif %}
+    {% endfor %}
+    {% endfor %}
+    {% endfor %}
 }
 
 server {
-    listen       {{ ansible_default_ipv4['address'] }}:80       default_server ;
-{% if keepalived %}
-    listen       {{ virtual_ip }}:80 ;
-{% endif %}
+    listen       {{ app_nginx_port }};
     server_name  {{ app_hostname }} _ "" ;
 
     proxy_buffering off;
@@ -37,9 +34,11 @@ server {
         proxy_buffers   					4 256k;
         proxy_busy_buffers_size   256k;
 
-        proxy_pass                http://app ;
+        proxy_pass                http://{{ app_nginx_upstream }} ;
+
+        access_log                /var/log/nginx/{{ app_name }}.access.log main;
+        error_log                 /var/log/nginx/{{ app_name }}.error.log ;
 
     }
 
 }
-

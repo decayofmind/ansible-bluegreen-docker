@@ -1,19 +1,30 @@
 ---
-bluegreen: true
-default_color: green
-check_mode: false
+app_bluegreen: True
+app_balancing: True
+
 app_name: www
 app_repo:
+app_nginx_upstream: "{{ app_name }}"
 app_port: 5000
 app_version: latest
 app_instances_count: 2
 app_hostname: localhost
-app_private_registry: false
+app_private_registry: False
+
+app_command: ""
+app_etc_hosts: {}
+app_env: {}
+app_volumes: []
+app_logdriver:
+app_log_options:
 
 port_prefix: 401
 port_prefix_blue: 402
 port_prefix_green: 407
 
 first_run: false
+check_mode: false
+
+_default_color: green
 
 # vim: set et fenc= ft=ansible sts=2 sw=2 ts=2 tw=0 :
