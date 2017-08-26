@@ -17,6 +17,10 @@
   tags:
     - common:facts
 
+- name: reread ansible_local facts
+  setup:
+    filter: ansible_local
+
 - name: do blue/green logic
   include: pre_tasks.yml
   when: app_bluegreen

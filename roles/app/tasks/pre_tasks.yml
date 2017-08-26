@@ -1,8 +1,4 @@
 ---
-- name: check very first run
-  set_fact:
-    app_first_run: True
-  when: ansible_local is not defined
 
 - name: check first run
   set_fact:
