@@ -25,18 +25,17 @@
   include: pre_tasks.yml
   when: app_bluegreen
 
-- name: cleanup dead containers
-  shell: docker rm -f $(docker ps -a -q -f status=dead)
-  register: dead_conts
-  ignore_errors: yes
-  changed_when: dead_conts.stdout != ""
-  tags:
-    - app:cleanup
+- name: cleanup dead containers workaround
+  include: cleanup_dead_containers.yml
 
-- local_action: debug msg="DEPLOYING {{ app_name }}.{% if app_bluegreen %}
-      Color of this deploy is {{ _next_color | upper }}.{% endif %}
-      Version is {{ app_version }}"
+- name: inform about current deployment
+  debug:
+    msg:
+      - "DEPLOYING {{ app_name }}!"
+      - "{% if app_bluegreen %}Color of this deploy is {{ _next_color | upper }}.{% endif %}"
+      - "Version is {{ app_version }}"
   run_once: yes
+  delegate_to: localhost
   tags:
     - app:info
     - app:deploy
@@ -65,8 +64,8 @@
     tags:
       - app:deploy
   rescue:
-    - name: cleanup dead containers
-      shell: docker rm -f $(docker ps -a -q -f status=dead)
+    - name: cleanup dead containers workaround
+      include: cleanup_dead_containers.yml
 
 - name: detect app ports
   set_fact:

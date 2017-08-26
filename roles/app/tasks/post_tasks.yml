@@ -5,7 +5,7 @@
     create: yes
     block: |
       [{{ app_name }}]
-      env_color: {{ next_color }}
+      env_color: {{ _next_color }}
       instances_count: {{ app_instances_count }}
       version: {{ app_version }}
 

@@ -1,0 +1,14 @@
+---
+
+- name: query for dead containers
+  command: docker ps -a -q -f status=dead
+  register: _dead_containers
+  changed_when: False
+  tags:
+    - skip_ansible_lint
+
+- name: cleanup dead containers
+  command: docker rm -f {{ _dead_containers.stdout }}
+  when: _dead_containers.stdout
+  tags:
+    - skip_ansible_lint
