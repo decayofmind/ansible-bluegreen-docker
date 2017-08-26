@@ -36,8 +36,8 @@ server {
 
         proxy_pass                http://{{ app_nginx_upstream }} ;
 
-        access_log                /var/log/nginx/{{ app_name }}.access.log main;
-        error_log                 /var/log/nginx/{{ app_name }}.error.log ;
+        access_log                /var/log/nginx/{{ app_name }}.access.log;
+        error_log                 /var/log/nginx/{{ app_name }}.error.log;
 
     }
 
