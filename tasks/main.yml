@@ -50,7 +50,7 @@
       name: "{{ app_name }}{% if app_bluegreen %}_{{ _next_color }}{% endif %}_{{ item }}"
       state: started
       ports: "{{ app_port_prefix }}{{ item  }}:{{ app_port }}"
-      image: "{{ app_image | d(app_name) }}:{{ app_version }}"
+      image: "{{ app_repo | d(app_name) }}:{{ app_version }}"
       command: "{{ app_command }}"
       restart_policy: unless-stopped
       etc_hosts: "{{ app_etc_hosts }}"

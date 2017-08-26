@@ -1,0 +1,24 @@
+---
+dependencies: []
+
+galaxy_info:
+  author: decayofmind
+  description: Blue-green deployment concept with Docker containers.
+  company: ""
+  license: "license (BSD, MIT)"
+  min_ansible_version: 2.2
+  platforms:
+    - name: EL
+      versions:
+      - 6
+      - 7
+    - name: Debian
+      versions:
+      - all
+    - name: Ubuntu
+      versions:
+      - trusty
+      - xenial
+  galaxy_tags:
+    - development
+    - web

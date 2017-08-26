@@ -1,8 +1,8 @@
-# ansible-bluegreen-docker
+# Ansible Role: ansible-bluegreen-docker
 
 [![Build Status](https://travis-ci.org/decayofmind/ansible-bluegreen-docker.svg?branch=master)](https://travis-ci.org/decayofmind/ansible-bluegreen-docker)
 
-Simple Ansible demo playbook to achieve blue-green deployments on local microinfrastructure
+Simple Ansible role showing concept of blue-green deployments on local microinfrastructure with Docker containers
 
 ## Role Variables
 
@@ -22,15 +22,20 @@ Simple Ansible demo playbook to achieve blue-green deployments on local microinf
 - `app_version` - Image version to install. (default: `latest`)
 - `app_volumes` - Array with volumes mounted in container. Used for storing peristent data. (default: `[]`)
 
+For more variables see [defaults/main.yml](defaults/main.yml)
+
 ## Nginx balancing
 
 1. Ansible get a list of all published ports in containers.
 2. Ansible prepare a nginx config with all published container's ports of all(!) app hosts.
 
-## Architecture
+## TODO
+
+- [ ] Tests with Molecule (from its v2. release)
+
+## Desired architecture
 ![architecture diagram](docs/architecture.png)
 
-## Communication
-![normal scenario](docs/lb-network-normal.png)
+## License
 
-![fail-over scenario](docs/lb-network-fail.png)
+MIT / BSD
