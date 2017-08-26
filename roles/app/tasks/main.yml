@@ -40,13 +40,13 @@
 - block:
   - name: debug port_prefix value
     debug:
-      var: port_prefix
+      var: app_port_prefix
 
   - name: deploy app
     docker_container:
       name: "{{ app_name }}{% if app_bluegreen %}_{{ _next_color }}{% endif %}_{{ item }}"
       state: started
-      ports: "{{ app_port_prefix }}{{ item  }}:{{ app_port  }}"
+      ports: "{{ app_port_prefix }}{{ item  }}:{{ app_port }}"
       image: "{{ app_image | d(app_name) }}:{{ app_version }}"
       command: "{{ app_command }}"
       restart_policy: unless-stopped
@@ -60,7 +60,6 @@
     register: deploy
     tags:
       - app:deploy
-      - skip_ansible_lint
   rescue:
     - name: cleanup dead containers
       shell: docker rm -f $(docker ps -a -q -f status=dead)

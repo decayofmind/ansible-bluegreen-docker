@@ -10,7 +10,7 @@ app_hostname: localhost
 app_port: 5000
 app_name: trainingwheels
 app_registry:
-app_repo: "decayofmind/{{ app_name }}"
+app_image: "decayofmind/{{ app_name }}"
 app_instances_count: 4
 app_private_registry: false
 

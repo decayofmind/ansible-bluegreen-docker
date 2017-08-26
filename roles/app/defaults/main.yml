@@ -15,7 +15,7 @@ app_command: ""
 app_etc_hosts: {}
 app_env: {}
 app_volumes: []
-app_log_driver:
+app_log_driver: none
 app_log_options:
 
 app_port_prefix: 401
