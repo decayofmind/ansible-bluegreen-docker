@@ -75,9 +75,10 @@
 
 - name: app health check
   uri:
-    url: "http://{% if item.values()[0][0].HostIp == '0.0.0.0' %}127.0.0.1{% else %}{{ item.values()[0][0].HostIp }}{% endif %}:{{ item.values()[0][0].HostPort }}/{{ app_health_check_path | d('') }}"
+    url: "http://{% if item.values()[0][0].HostIp == '0.0.0.0' %}127.0.0.1{% else %}{{ item.values()[0][0].HostIp }}{% endif %}:{{ item.values()[0][0].HostPort }}{{ app_health_check_path }}"
     method: GET
     status_code: 200
+  when: app_check_health
   with_items:
     - "{{ app_ports }}"
   tags:

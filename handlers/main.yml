@@ -10,7 +10,11 @@
     state: reloaded
 
 - name: make test request
-  uri: url="http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}/{{ app_health_check_path | d('') }}" method=GET status_code=200
+  uri:
+    url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}{{ app_health_check_path }}"
+    method: GET
+    status_code: 200
+  when: app_check_health
   tags:
     - app:check
 

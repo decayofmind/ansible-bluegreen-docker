@@ -12,6 +12,10 @@ app_nginx_port: 80
 app_port: 5000
 app_version: latest
 app_instances_count: 2
+app_stop_inactive_color: True
+
+app_check_health: True
+app_health_check_path: "/"
 app_hostname: localhost
 
 app_command: ""
