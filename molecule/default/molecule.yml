@@ -1,0 +1,32 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: delegated
+  options:
+    ansible_connection_options:
+      connection: local
+lint:
+  name: yamllint
+  options:
+    config-file: molecule/default/yamllint.yml
+platforms:
+  - name: delegated-travis-instance
+provisioner:
+  name: ansible
+  playbooks:
+    side_effect: side_effect.yml
+  lint:
+    name: ansible-lint
+  inventory:
+    host_vars:
+      delegated-travis-instance:
+        ansible_connection: local
+scenario:
+  name: default
+verifier:
+  name: testinfra
+  options:
+    verbose: True
+  lint:
+    name: flake8

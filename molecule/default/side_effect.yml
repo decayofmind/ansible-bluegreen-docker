@@ -1,0 +1,16 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: True
+  become: True
+
+  vars:
+    app_env:
+      REDIS_HOST: redis
+    app_etc_hosts:
+      redis: "{{ ansible_default_ipv4.address }}"
+    app_repo: "decayofmind/{{ app_name }}"
+    app_stop_inactive_color: False
+
+  roles:
+    - role: ansible-bluegreen-docker

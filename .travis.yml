@@ -4,27 +4,32 @@ sudo: required
 
 language: python
 python:
-- "2.7"
+  - "2.7"
 
 services:
-- docker
+  - docker
 
 before_install:
-- deactivate
-- sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 3B4FE6ACC0B21F32 40976EAF437D05B5
-- sudo apt-get update -qq
-- sudo apt-get install -y -o Dpkg::Options::="--force-confnew" docker-ce
+  - deactivate
+  - |
+    sudo apt-key adv --recv-keys \
+      --keyserver keyserver.ubuntu.com 3B4FE6ACC0B21F32 40976EAF437D05B5
+  - sudo apt-get update -qq
+  - sudo apt-get install -y -o Dpkg::Options::="--force-confnew" docker-ce
 
 install:
-- sudo pip install ansible ansible-lint
-- sudo pip install docker-py
-- ansible --version
-- cd tests
+  - sudo pip install ansible ansible-lint docker-py molecule
+  - ansible --version
+  - molecule --version
 
 before_script:
-- docker run -d --net=host redis
-- sudo apt-get install -y nginx
-- sudo service nginx start
+  - docker run -d --net=host redis
+  - sudo apt-get install -y nginx
+  - sudo service nginx start
 
 script:
-- bash test.sh
+  - molecule test
+
+after_script:
+  - docker ps -a
+  - curl http://localhost

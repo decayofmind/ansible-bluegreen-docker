@@ -37,10 +37,6 @@ For more variables see [defaults/main.yml](defaults/main.yml)
 1. Ansible get a list of all published ports in containers.
 2. Ansible prepare a nginx config with all published container's ports of all(!) app hosts.
 
-## TODO
-
-- [ ] Tests with Molecule (from its v2. release)
-
 ## Desired architecture
 ![architecture diagram](docs/architecture.png)
 
