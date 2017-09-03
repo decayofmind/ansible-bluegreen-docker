@@ -7,27 +7,27 @@
   ignore_errors: yes
 
 - block:
-  - name: determine current color
-    set_fact:
-      _current_color: "{{ ansible_local[app_name][app_name].env_color }}"
+    - name: determine current color
+      set_fact:
+        _current_color: "{{ ansible_local[app_name][app_name].env_color }}"
 
-  - name: determine current count of instances
-    set_fact:
-      _current_count: "{{ ansible_local[app_name][app_name].instances_count }}"
+    - name: determine current count of instances
+      set_fact:
+        _current_count: "{{ ansible_local[app_name][app_name].instances_count }}"
 
-  - name: determine current version
-    set_fact:
-      _current_version: "{{ ansible_local[app_name][app_name].version }}"
+    - name: determine current version
+      set_fact:
+        _current_version: "{{ ansible_local[app_name][app_name].version }}"
   when: not app_first_run
 
 - block:
-  - name: set current color if not in facts
-    set_fact:
-      _current_color: "{{ app_default_color }}"
+    - name: set current color if not in facts
+      set_fact:
+        _current_color: "{{ app_default_color }}"
 
-  - name: determine current count of instances if not in facts
-    set_fact:
-      _current_count: "{{ app_instances_count }}"
+    - name: determine current count of instances if not in facts
+      set_fact:
+        _current_count: "{{ app_instances_count }}"
   when: app_first_run
 
 - name: set new color

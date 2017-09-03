@@ -41,31 +41,35 @@
     - app:deploy
 
 - block:
-  - name: debug port_prefix value
-    debug:
-      var: app_port_prefix
+    - name: debug port_prefix value
+      debug:
+        var: app_port_prefix
 
-  - name: deploy app
-    docker_container:
-      name: "{{ app_name }}{% if app_bluegreen %}_{{ _next_color }}{% endif %}_{{ item }}"
-      state: started
-      ports: "{{ app_port_prefix }}{{ item  }}:{{ app_port }}"
-      image: "{{ app_repo | d(app_name) }}:{{ app_version }}"
-      command: "{{ app_command }}"
-      restart_policy: unless-stopped
-      etc_hosts: "{{ app_etc_hosts }}"
-      log_driver: "{{ app_log_driver }}"
-      log_options: "{{ app_log_options }}"
-      env: "{{ app_env }}"
-      volumes: "{{ app_volumes }}"
-    with_sequence: count={{ app_instances_count }}
-    check_mode: "{{ app_check_mode }}"
-    register: deploy
-    tags:
-      - app:deploy
+    - name: deploy app
+      docker_container:
+        name: "{{ app_name }}{% if app_bluegreen %}_{{ _next_color }}{% endif %}_{{ item }}"
+        state: started
+        ports: "{{ app_port_prefix }}{{ item  }}:{{ app_port }}"
+        image: "{{ app_repo | d(app_name) }}:{{ app_version }}"
+        command: "{{ app_command }}"
+        restart_policy: unless-stopped
+        etc_hosts: "{{ app_etc_hosts }}"
+        log_driver: "{{ app_log_driver }}"
+        log_options: "{{ app_log_options }}"
+        env: "{{ app_env }}"
+        volumes: "{{ app_volumes }}"
+      with_sequence: count={{ app_instances_count }}
+      check_mode: "{{ app_check_mode }}"
+      register: deploy
+      tags:
+        - app:deploy
   rescue:
     - name: cleanup dead containers workaround
       include: cleanup_dead_containers.yml
+
+    - name: fail play, cause something went wrong
+      fail:
+        msg: "Something went wrong!"
 
 - name: detect app ports
   set_fact:
@@ -75,6 +79,7 @@
 
 - name: app health check
   uri:
+    # yamllint disable-line rule:line-length
     url: "http://{% if item.values()[0][0].HostIp == '0.0.0.0' %}127.0.0.1{% else %}{{ item.values()[0][0].HostIp }}{% endif %}:{{ item.values()[0][0].HostPort }}{{ app_health_check_path }}"
     method: GET
     status_code: 200

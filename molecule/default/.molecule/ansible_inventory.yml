@@ -1,0 +1,11 @@
+# Molecule managed
+
+---
+all:
+  hosts:
+    delegated-travis-instance: &id001
+      ansible_connection: docker
+ungrouped:
+  hosts:
+    delegated-travis-instance: *id001
+  vars: {}
