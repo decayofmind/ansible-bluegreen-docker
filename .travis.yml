@@ -29,7 +29,7 @@ before_script:
   - sudo service nginx start
 
 script:
-  - molecule test
+  - molecule test -s travis
 
 after_script:
   - docker ps -a
