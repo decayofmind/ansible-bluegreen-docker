@@ -6,6 +6,7 @@ sudo: required
 language: python
 python:
   - "2.7"
+  - "3.6"
 
 services:
   - docker
@@ -20,6 +21,7 @@ before_install:
 
 install:
   - sudo pip install -r requirements.txt
+  - docker version
   - ansible --version
   - molecule --version
 
@@ -33,3 +35,6 @@ script:
 
 after_script:
   - docker ps -a
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/
