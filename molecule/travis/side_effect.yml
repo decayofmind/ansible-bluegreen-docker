@@ -1,16 +1,17 @@
 ---
-- name: Converge
+
+- name: SideEffect
   hosts: all
-  gather_facts: True
-  become: True
+  gather_facts: yes
+  become: yes
 
   vars:
     app_env:
-      REDIS_HOST: redis
+      REDIS_URL: redis://redis:6379
     app_etc_hosts:
       redis: "{{ ansible_default_ipv4.address }}"
-    app_repo: "decayofmind/{{ app_name }}"
-    app_version: "1.0.1"
+    app_instances_count: 3
+    app_version: 'v4'
 
   roles:
     - role: ansible-bluegreen-docker

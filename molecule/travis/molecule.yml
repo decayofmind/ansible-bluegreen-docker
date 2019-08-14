@@ -4,18 +4,17 @@ dependency:
 driver:
   name: delegated
   options:
+    managed: False
     ansible_connection_options:
       connection: local
 lint:
   name: yamllint
   options:
-    config-file: molecule/default/yamllint.yml
+    config-file: molecule/travis/yamllint.yml
 platforms:
   - name: delegated-travis-instance
 provisioner:
   name: ansible
-  playbooks:
-    side_effect: side_effect.yml
   lint:
     name: ansible-lint
   inventory:
@@ -23,7 +22,7 @@ provisioner:
       delegated-travis-instance:
         ansible_connection: local
 scenario:
-  name: default
+  name: travis
 verifier:
   name: testinfra
   options:

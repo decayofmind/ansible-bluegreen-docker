@@ -1,29 +1,24 @@
 ---
+
 - name: store host facts
   blockinfile:
     dest: /etc/ansible/facts.d/{{ app_name }}.fact
+    marker: "{mark}"
+    marker_begin: '{'
+    marker_end: '}'
     create: yes
     block: |
-      [{{ app_name }}]
-      env_color: {{ _next_color }}
-      instances_count: {{ app_instances_count }}
-      version: {{ app_version }}
+        "env_color": "{{ _app_next_color }}",
+        "instances_count": "{{ app_instances_count }}",
+        "version": "{{ app_version }}"
 
-- name: reread ansible_local facts
-  setup:
-    filter: ansible_local
-
-- name: stop old env containers
+- name: stop or remove old env containers
   docker_container:
-    name: "{{ app_name }}_{{ _current_color }}_{{ item }}"
-    state: stopped
-  with_sequence: count={{ _current_count }}
+    name: "{{ app_name }}_{{ _app_prev_color }}_{{ item }}"
+    state: "{{ app_old_containers_treatment_type }}"
+  loop: "{{ range(_app_prev_count | int) | list }}"
   ignore_errors: yes
   when:
-    - not app_first_run
-    - app_version != _current_version
-    - app_stop_inactive_color
-  tags:
-    - skip_ansible_lint
-
-# vim: set et fenc= ft=ansible sts=2 sw=2 ts=2 tw=0 :
+    - not _app_first_run
+    - app_version != _app_prev_version
+    - app_old_containers_treatment_enabled

@@ -1,0 +1,46 @@
+# {{ ansible_managed }}
+
+upstream {{ app_nginx_upstream_name }} {
+    {% if app_nginx_ip_hash %}
+    ip_hash;
+    {% endif %}
+
+    {% for p in _app_ports %}
+    server {{ p.HostIp }}:{{ p.HostPort }};
+    {% endfor %}
+
+    {% if app_nginx_crossbalance_enabled %}
+    {% for host in app_nginx_crossbalance_hosts %}
+    {% for p in hostvars[host]['_app_ports'] %}
+    server {% if p.HostIp == "0.0.0.0" -%}{{ hostvars[host]['ansible_default_ipv4']['address'] }}{% else %}{{ p.HostIp }}{% endif %}:{{ p.HostPort }};
+    {% endfor %}
+    {% endfor %}
+    {% endif %}
+}
+
+server {
+    listen       {{ app_nginx_port }};
+    server_name  {{ app_nginx_hostnames | join(' ') }};
+
+    access_log /var/log/nginx/{{ app_name }}.access.log;
+    error_log  /var/log/nginx/{{ app_name }}.error.log;
+
+    proxy_buffering off;
+    proxy_store     off;
+    proxy_cache     off;
+
+    location ~* / {
+        proxy_set_header          Host $host;
+        proxy_set_header          X-Forwarded-Server $host;
+        proxy_set_header          X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass_header         X-Accel-Redirect;
+        proxy_set_header          X-Real-IP $remote_addr;
+        proxy_buffer_size         128k;
+        proxy_buffers             4 256k;
+        proxy_busy_buffers_size   256k;
+
+        proxy_pass                http://{{ app_nginx_upstream_name }} ;
+
+    }
+
+}

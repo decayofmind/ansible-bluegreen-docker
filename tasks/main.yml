@@ -4,8 +4,6 @@
   file:
     path: /etc/ansible/facts.d
     state: directory
-  tags:
-    - common:facts
 
 - name: put dummy fact to local facts dir
   lineinfile:
@@ -14,98 +12,74 @@
     regexp: '^{ "fact": true }'
     create: yes
     state: present
-  tags:
-    - common:facts
-
-- name: reread ansible_local facts
-  setup:
-    filter: ansible_local
 
 - name: do blue/green logic
-  include: pre_tasks.yml
-  when: app_bluegreen
+  include_tasks: pre_tasks.yml
+  when: app_bluegreen_enabled
 
 - name: cleanup dead containers workaround
-  include: cleanup_dead_containers.yml
+  include_tasks: cleanup_dead_containers.yml
+  when: app_cleanup_dead_containers
 
-- name: inform about current deployment
+- name: inform about ongoing deployment
   debug:
     msg:
       - "DEPLOYING {{ app_name }}!"
-      - "{% if app_bluegreen %}Color of this deploy is {{ _next_color | upper }}.{% endif %}"
-      - "Version is {{ app_version }}"
+      - "{% if app_bluegreen_enabled %}Color of this deployment is {{ _app_next_color | upper }}.{% endif %}"
+      - "Version is {{ app_version }}."
   run_once: yes
   delegate_to: localhost
-  tags:
-    - app:info
-    - app:deploy
 
-- block:
-    - name: debug port_prefix value
-      debug:
-        var: app_port_prefix
-
-    - name: deploy app
-      docker_container:
-        name: "{{ app_name }}{% if app_bluegreen %}_{{ _next_color }}{% endif %}_{{ item }}"
-        state: started
-        ports: "{{ app_port_prefix }}{{ item  }}:{{ app_port }}"
-        image: "{{ app_repo | d(app_name) }}:{{ app_version }}"
-        command: "{{ app_command }}"
-        restart_policy: unless-stopped
-        etc_hosts: "{{ app_etc_hosts }}"
-        log_driver: "{{ app_log_driver }}"
-        log_options: "{{ app_log_options }}"
-        env: "{{ app_env }}"
-        volumes: "{{ app_volumes }}"
-      with_sequence: count={{ app_instances_count }}
-      check_mode: "{{ app_check_mode }}"
-      register: deploy
-      tags:
-        - app:deploy
-  rescue:
-    - name: cleanup dead containers workaround
-      include: cleanup_dead_containers.yml
-
-    - name: fail play, cause something went wrong
-      fail:
-        msg: "Something went wrong!"
+- name: deploy app
+  docker_container:
+    name: "{{ app_name }}{% if app_bluegreen_enabled %}_{{ _app_next_color }}{% endif %}_{{ item }}"
+    state: started
+    ports: "{{ app_port_prefix }}{{ item }}:{{ app_port }}"
+    image: "{{ app_image }}:{{ app_version }}"
+    command: "{{ app_command }}"
+    restart_policy: unless-stopped
+    etc_hosts: "{{ app_etc_hosts }}"
+    log_driver: "{{ app_log_driver }}"
+    log_options: "{{ app_log_options }}"
+    env: "{{ app_env }}"
+    volumes: "{{ app_volumes }}"
+  loop: "{{ range(app_instances_count)|list }}"
+  register: _app_deployment
 
 - name: detect app ports
   set_fact:
-    app_ports: "{{ deploy.results| map(attribute='ansible_facts.docker_container.NetworkSettings.Ports')| list }}"
-  tags:
-    - app:deploy
+    _app_ports: "{{ _app_deployment.results | json_query('[].ansible_facts.docker_container.NetworkSettings.Ports[].*[][] ') }}"
 
-- name: app health check
+- name: perform healthcheck on deployed containers
   uri:
-    # yamllint disable-line rule:line-length
-    url: "http://{% if item.values()[0][0].HostIp == '0.0.0.0' %}127.0.0.1{% else %}{{ item.values()[0][0].HostIp }}{% endif %}:{{ item.values()[0][0].HostPort }}{{ app_health_check_path }}"
+    url: "{{ 'http://' + item.HostIp + ':' + item.HostPort + app_healthcheck_path }}"
     method: GET
     status_code: 200
-  when: app_check_health
+  retries: 10
+  delay: 5
+  register: _app_healthcheck_result
+  until: _app_healthcheck_result.failed is defined
+  changed_when: False
+  when: app_healthcheck_enabled
   with_items:
-    - "{{ app_ports }}"
-  tags:
-    - app:deploy
+    - "{{ _app_ports }}"
 
-- name: generate nginx config for app
+- name: generate nginx config for the application
   template:
-    src: etc/nginx/conf.d/app.conf.j2
+    src: nginx.conf.j2
     dest: "/etc/nginx/conf.d/{{ app_name }}.conf"
     backup: yes
-  when: app_balancing
+  when: app_nginx_enabled
   register: _nginx_config
   notify:
     - check nginx configuration
     - reload nginx
-    - make test request
-  tags:
-    - app:nginx
+    - make test request to nginx
+    - cleanup nginx config backups
 
-- name: fire handlers
+- name: flush handlers
   meta: flush_handlers
 
 - name: do blue/green logic
-  include: post_tasks.yml
-  when: app_bluegreen
+  include_tasks: post_tasks.yml
+  when: app_bluegreen_enabled

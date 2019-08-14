@@ -2,13 +2,15 @@
 
 - name: query for dead containers
   command: docker ps -a -q -f status=dead
-  register: _dead_containers
+  register: _app_dead_containers
   changed_when: False
   tags:
     - skip_ansible_lint
 
 - name: cleanup dead containers
-  command: docker rm -f {{ _dead_containers.stdout }}
-  when: _dead_containers.stdout
-  tags:
-    - skip_ansible_lint
+  docker_container:
+    name: "{{ item }}"
+    force_kill: yes
+    state: absent
+  loop: "{{ _app_dead_containers.stdout_lines }}"
+  when: _app_dead_containers.stdout

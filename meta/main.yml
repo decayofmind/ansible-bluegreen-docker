@@ -6,19 +6,19 @@ galaxy_info:
   description: Blue-green deployment concept with Docker containers.
   company: ""
   license: "license (BSD, MIT)"
-  min_ansible_version: 2.2
+  min_ansible_version: 2.6
   platforms:
     - name: EL
       versions:
-        - 6
         - 7
     - name: Debian
       versions:
         - all
     - name: Ubuntu
       versions:
-        - trusty
         - xenial
+        - bionic
   galaxy_tags:
     - development
     - web
+    - docker
