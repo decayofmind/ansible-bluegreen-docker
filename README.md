@@ -94,8 +94,3 @@ Additionally for my test application (_decayofmind/trainingwheels_) you will nee
 
 ## Desired Architecture
 ![architecture diagram](docs/architecture.png)
-
-
-## License
-
-MIT / BSD
